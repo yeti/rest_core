@@ -186,8 +186,8 @@ class ManticomTestCase(APITestCaseWithAssertions):
 
     def add_credentials(self, user):
         if user:
-            token = user.token_set.first()
-            self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + token.key)
+            token = user.accesstoken_set.first()
+            self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + token.token)
         else:
             self.client.credentials()
 
