@@ -235,6 +235,7 @@ class ManticomTestCase(APITestCaseWithAssertions):
     ):
         """
         Runs a POST request and checks the POST data and results match the manticom schema
+        :rtype : object
         """
         self.check_schema_keys(data, self.schema_objects[request_object_name])
 
