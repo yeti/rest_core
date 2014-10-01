@@ -1,7 +1,10 @@
 import factory
 import datetime
 from oauth2_provider.models import AccessToken
-from videos.models import User
+from django.contrib.auth import get_user_model
+
+
+User = get_user_model()
 
 
 class UserFactory(factory.Factory):
