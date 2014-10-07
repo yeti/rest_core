@@ -279,8 +279,20 @@ class ManticomTestCase(APITestCaseWithAssertions):
 
         return response
 
-    def assertManticomDELETEResponse(self):
-        pass
+    def assertManticomDELETEResponse(self,
+                                     url,
+                                     user,
+                                     unauthorized=False,
+                                     **kwargs):
+        self.add_credentials(user)
+        response = self.client.delete(url)
+
+        if unauthorized:
+            self.assertHttpUnauthorized(response)
+        else:
+            self.assertHttpAccepted(response)
+
+        return response
 
     def assertPhotoUpload(self):
         pass
