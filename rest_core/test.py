@@ -231,6 +231,7 @@ class ManticomTestCase(APITestCaseWithAssertions):
             response_object_name,
             data,
             user,
+            format="json",
             unauthorized=False,
             keypath="results"
     ):
@@ -241,7 +242,7 @@ class ManticomTestCase(APITestCaseWithAssertions):
         # self.check_schema_keys(data, self.schema_objects[request_object_name])
 
         self.add_credentials(user)
-        response = self.client.post(url, data)
+        response = self.client.post(url, data, format=format)
         if unauthorized:
             self.assertHttpUnauthorized(response)
         else:
@@ -251,8 +252,32 @@ class ManticomTestCase(APITestCaseWithAssertions):
 
         return response
 
-    def assertManticomPATCHResponse(self):
-        pass
+    def assertManticomPATCHResponse(self,
+            url,
+            request_object_name,
+            response_object_name,
+            data,
+            user,
+            format="json",
+            unauthorized=False,
+            keypath="results"
+    ):
+        """
+        Runs a POST request and checks the POST data and results match the manticom schema
+        :rtype : object
+        """
+        # self.check_schema_keys(data, self.schema_objects[request_object_name])
+
+        self.add_credentials(user)
+        response = self.client.patch(url, data, format=format)
+        if unauthorized:
+            self.assertHttpUnauthorized(response)
+        else:
+            self.assertHttpOK(response)
+            self.assertTrue(response['Content-Type'].startswith('application/json'))
+            self.check_response_data(response, keypath, response_object_name)
+
+        return response
 
     def assertManticomDELETEResponse(self):
         pass
