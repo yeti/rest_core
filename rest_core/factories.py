@@ -1,3 +1,4 @@
+from django.utils.timezone import now
 import factory
 import datetime
 from oauth2_provider.models import AccessToken
@@ -22,6 +23,6 @@ class UserFactory(factory.Factory):
         AccessToken.objects.create(user=user,
                                    application=user.application_set.first(),
                                    token='token{}'.format(user.id),
-                                   expires=datetime.datetime.utcnow() + datetime.timedelta(days=1)
+                                   expires=now() + datetime.timedelta(days=1)
         )
         return user
