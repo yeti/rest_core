@@ -288,7 +288,7 @@ class ManticomTestCase(APITestCaseWithAssertions):
         response = self.client.delete(url)
 
         if unauthorized:
-            self.assertHttpUnauthorized(response)
+            self.assertHttpForbidden(response)
         else:
             self.assertHttpAccepted(response)
 
