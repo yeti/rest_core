@@ -233,7 +233,7 @@ class ManticomTestCase(APITestCaseWithAssertions):
             user,
             format="json",
             unauthorized=False,
-            empty_response=False,
+            status_OK=False,
             keypath="results"
     ):
         """
@@ -246,7 +246,7 @@ class ManticomTestCase(APITestCaseWithAssertions):
         response = self.client.post(url, data, format=format)
         if unauthorized:
             self.assertHttpUnauthorized(response)
-        if empty_response:
+        if status_OK:
             self.assertHttpOK(response)
         else:
             self.assertHttpCreated(response)
