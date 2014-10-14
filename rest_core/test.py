@@ -274,7 +274,8 @@ class ManticomTestCase(APITestCaseWithAssertions):
         self.add_credentials(user)
         response = self.client.patch(url, data, format=format)
         if unauthorized:
-            self.assertHttpUnauthorized(response)
+            # self.assertHttpUnauthorized(response)
+            self.assertHttpForbidden(response)
         else:
             self.assertHttpOK(response)
             self.assertTrue(response['Content-Type'].startswith('application/json'))
