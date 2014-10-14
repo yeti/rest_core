@@ -217,7 +217,7 @@ class ManticomTestCase(APITestCaseWithAssertions):
         self.add_credentials(user)
         response = self.client.get(url, parameters)
         if unauthorized:
-            self.assertHttpUnauthorized(response)
+            self.assertHttpForbidden(response)
         else:
             self.assertValidJSONResponse(response)
             self.check_response_data(response, keypath, response_object_name)
@@ -245,7 +245,7 @@ class ManticomTestCase(APITestCaseWithAssertions):
         self.add_credentials(user)
         response = self.client.post(url, data, format=format)
         if unauthorized:
-            self.assertHttpUnauthorized(response)
+            self.assertHttpForbidden(response)
         if status_OK:
             self.assertHttpOK(response)
         else:
@@ -274,7 +274,6 @@ class ManticomTestCase(APITestCaseWithAssertions):
         self.add_credentials(user)
         response = self.client.patch(url, data, format=format)
         if unauthorized:
-            # self.assertHttpUnauthorized(response)
             self.assertHttpForbidden(response)
         else:
             self.assertHttpOK(response)
@@ -329,7 +328,7 @@ class ManticomTestCase(APITestCaseWithAssertions):
         response = self.client.post(url, **kwargs)
 
         if unauthorized:
-            self.assertHttpUnauthorized(response)
+            self.assertHttpForbidden(response)
         else:
             self.assertHttpCreated(response)
             self.assertTrue(response['Content-Type'].startswith('application/json'))
