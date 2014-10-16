@@ -76,6 +76,14 @@ class APITestCaseWithAssertions(APITestCase):
         """
         return self.assertEqual(resp.status_code, 405)
 
+    def assertHttpNotAllowed(self, resp):
+        """
+        Depending on how we purposefully reject a call (e.g., limiting methods, using permission classes, etc.,
+        we may have a few different HTTP response codes. Bundling these together into a single assertion so that
+        Manticom tests can be more flexible.
+        """
+        return self.assertIn(resp.status_code, [401, 403, 404, 405])
+
     def assertHttpConflict(self, resp):
         """
         Ensures the response is returning a HTTP 409.
@@ -166,8 +174,6 @@ class ManticomTestCase(APITestCaseWithAssertions):
                     if is_optional:
                         continue
                     else:
-                        print schema_field
-                        print data_object
                         raise self.failureException("No data for object {0}".format(new_schema_object))
 
                 new_data_object = data_object[schema_field]
@@ -217,7 +223,7 @@ class ManticomTestCase(APITestCaseWithAssertions):
         self.add_credentials(user)
         response = self.client.get(url, parameters)
         if unauthorized:
-            self.assertHttpForbidden(response)
+            self.assertHttpNotAllowed(response)
         else:
             self.assertValidJSONResponse(response)
             self.check_response_data(response, keypath, response_object_name)
@@ -238,15 +244,14 @@ class ManticomTestCase(APITestCaseWithAssertions):
     ):
         """
         Runs a POST request and checks the POST data and results match the manticom schema
-        :rtype : object
         """
-        # self.check_schema_keys(data, self.schema_objects[request_object_name])
+        self.check_schema_keys(data, self.schema_objects[request_object_name])
 
         self.add_credentials(user)
         response = self.client.post(url, data, format=format)
         if unauthorized:
-            self.assertHttpForbidden(response)
-        if status_OK:
+            self.assertHttpNotAllowed(response)
+        elif status_OK:
             self.assertHttpOK(response)
         else:
             self.assertHttpCreated(response)
@@ -267,14 +272,13 @@ class ManticomTestCase(APITestCaseWithAssertions):
     ):
         """
         Runs a POST request and checks the POST data and results match the manticom schema
-        :rtype : object
         """
-        # self.check_schema_keys(data, self.schema_objects[request_object_name])
+        self.check_schema_keys(data, self.schema_objects[request_object_name])
 
         self.add_credentials(user)
         response = self.client.patch(url, data, format=format)
         if unauthorized:
-            self.assertHttpForbidden(response)
+            self.assertHttpNotAllowed(response)
         else:
             self.assertHttpOK(response)
             self.assertTrue(response['Content-Type'].startswith('application/json'))
@@ -285,13 +289,12 @@ class ManticomTestCase(APITestCaseWithAssertions):
     def assertManticomDELETEResponse(self,
                                      url,
                                      user,
-                                     unauthorized=False,
-                                     **kwargs):
+                                     unauthorized=False):
         self.add_credentials(user)
         response = self.client.delete(url)
 
         if unauthorized:
-            self.assertHttpForbidden(response)
+            self.assertHttpNotAllowed(response)
         else:
             self.assertHttpAccepted(response)
 
