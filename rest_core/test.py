@@ -158,7 +158,7 @@ class ManticomTestCase(APITestCaseWithAssertions):
             new_schema_object = None
             for part in schema_parts:
                 # Parse through all parts, regardless of ordering
-                if part == "array":
+                if part in ["array", "O2M", "M2M"]:
                     is_list = True
                 elif part == "optional":
                     is_optional = True
