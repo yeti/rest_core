@@ -1,7 +1,7 @@
 from rest_framework import permissions
 
 
-class IsOwner(permissions.BasePermission):
+class IsOwner(permissions.IsAuthenticated):
     """
     Only the object's owner can view or edit
     Assumes the model instance has a `user` attribute.
