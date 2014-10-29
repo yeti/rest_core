@@ -25,8 +25,12 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
 
-        # Instance must have an attribute named `user`.
-        return obj.user == request.user
+        try:
+            # Instance must have an attribute named `user`.
+            return obj.user == request.user
+        except:
+            # Or if instance itself is a 'user'
+            return obj == request.user
 
 
 class IsOwnerOrAuthenticatedReadOnly(IsOwnerOrReadOnly, permissions.IsAuthenticated):
