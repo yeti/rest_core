@@ -1,4 +1,7 @@
 from rest_framework import permissions
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 class IsOwner(permissions.IsAuthenticated):
@@ -25,12 +28,10 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
 
-        try:
-            # Instance must have an attribute named `user`.
-            return obj.user == request.user
-        except:
-            # Or if instance itself is a 'user'
+        if isinstance(obj, User):
             return obj == request.user
+        else:
+            return obj.user == request.user
 
 
 class IsOwnerOrAuthenticatedReadOnly(IsOwnerOrReadOnly, permissions.IsAuthenticated):
