@@ -18,6 +18,14 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
     Unauthenticated users can still read.
     Assumes the model instance has a `user` attribute.
     """
+    def has_permission(self, request, view):
+        """
+        This is specifically to use PUT for bulk updates, where it appears DRF does not use `has_object_permission`
+        """
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        else:
+            return request.user.is_authenticated()
 
     def has_object_permission(self, request, view, obj):
         # Read permissions are allowed to any request,

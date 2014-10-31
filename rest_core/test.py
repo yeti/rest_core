@@ -201,11 +201,17 @@ class ManticomTestCase(APITestCaseWithAssertions):
 
     def check_response_data(self, response, keypath, response_object_name):
         results_data = response.data
-        if 'count' in results_data:  # If a list is returned, process looking for the first item
-            results_data = results_data[keypath]
+
+        if keypath in response.data or isinstance(response.data, list):  # If multiple objects returned
+            if keypath in response.data:
+                results_data = response.data[keypath]
+            else:  # A plain list is returned, i.e. from a bulk update request
+                results_data = response.data
+
             if len(results_data) == 0:
                 raise self.failureException("No data to compare response")
             results_data = results_data[0]
+
         self.check_schema_keys(results_data, self.schema_objects[response_object_name])
 
     def assertManticomGETResponse(
@@ -279,6 +285,40 @@ class ManticomTestCase(APITestCaseWithAssertions):
         response = self.client.patch(url, data, format=format)
         if unauthorized:
             self.assertHttpNotAllowed(response)
+        else:
+            self.assertHttpOK(response)
+            self.assertTrue(response['Content-Type'].startswith('application/json'))
+            self.check_response_data(response, keypath, response_object_name)
+
+        return response
+
+    def assertManticomPUTResponse(self,
+            url,
+            request_object_name,
+            response_object_name,
+            data,
+            user,
+            format="json",
+            unauthorized=False,
+            forbidden=False,
+            keypath="results"
+    ):
+        """
+        Runs a PUT request and checks the PUT data and results match the manticom schema for bulk updates.
+        Assumes that all objects sent in a bulk update are identical, and hence only checks that the first one
+        matches the schema.
+        """
+        self.check_schema_keys(data[0], self.schema_objects[request_object_name])
+
+        self.add_credentials(user)
+        response = self.client.put(url, data, format=format)
+        if forbidden:
+            # Attempting to update an object that isn't yours means it isn't in the queryset. DRF reads this as
+            # creating, not updating. Since we have the `allow_add_remove` option set to False, creating isn't
+            # allowed. So, instead of being rejected with a 403, server returns a 400 Bad Request.
+            self.assertHttpBadRequest(response)
+        elif unauthorized:
+            self.assertHttpUnauthorized(response)
         else:
             self.assertHttpOK(response)
             self.assertTrue(response['Content-Type'].startswith('application/json'))
