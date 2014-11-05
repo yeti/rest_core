@@ -199,12 +199,12 @@ class ManticomTestCase(APITestCaseWithAssertions):
         else:
             self.client.credentials()
 
-    def check_response_data(self, response, keypath, response_object_name):
+    def check_response_data(self, response, response_object_name):
         results_data = response.data
 
-        if keypath in response.data or isinstance(response.data, list):  # If multiple objects returned
-            if keypath in response.data:
-                results_data = response.data[keypath]
+        if "results" in response.data or isinstance(response.data, list):  # If multiple objects returned
+            if "results" in response.data:
+                results_data = response.data["results"]
             else:  # A plain list is returned, i.e. from a bulk update request
                 results_data = response.data
 
@@ -220,8 +220,7 @@ class ManticomTestCase(APITestCaseWithAssertions):
             parameters,
             response_object_name,
             user,
-            unauthorized=False,
-            keypath="results"
+            unauthorized=False
     ):
         """
         Runs a GET request and checks the GET parameters and results match the manticom schema
@@ -232,7 +231,7 @@ class ManticomTestCase(APITestCaseWithAssertions):
             self.assertHttpNotAllowed(response)
         else:
             self.assertValidJSONResponse(response)
-            self.check_response_data(response, keypath, response_object_name)
+            self.check_response_data(response, response_object_name)
 
         return response
 
@@ -245,8 +244,7 @@ class ManticomTestCase(APITestCaseWithAssertions):
             user,
             format="json",
             unauthorized=False,
-            status_OK=False,
-            keypath="results"
+            status_OK=False
     ):
         """
         Runs a POST request and checks the POST data and results match the manticom schema
@@ -262,7 +260,7 @@ class ManticomTestCase(APITestCaseWithAssertions):
         else:
             self.assertHttpCreated(response)
             self.assertTrue(response['Content-Type'].startswith('application/json'))
-            self.check_response_data(response, keypath, response_object_name)
+            self.check_response_data(response, response_object_name)
 
         return response
 
@@ -273,8 +271,7 @@ class ManticomTestCase(APITestCaseWithAssertions):
             data,
             user,
             format="json",
-            unauthorized=False,
-            keypath="results"
+            unauthorized=False
     ):
         """
         Runs a POST request and checks the POST data and results match the manticom schema
@@ -288,7 +285,7 @@ class ManticomTestCase(APITestCaseWithAssertions):
         else:
             self.assertHttpOK(response)
             self.assertTrue(response['Content-Type'].startswith('application/json'))
-            self.check_response_data(response, keypath, response_object_name)
+            self.check_response_data(response, response_object_name)
 
         return response
 
@@ -300,8 +297,7 @@ class ManticomTestCase(APITestCaseWithAssertions):
             user,
             format="json",
             unauthorized=False,
-            forbidden=False,
-            keypath="results"
+            forbidden=False
     ):
         """
         Runs a PUT request and checks the PUT data and results match the manticom schema for bulk updates.
@@ -322,7 +318,7 @@ class ManticomTestCase(APITestCaseWithAssertions):
         else:
             self.assertHttpOK(response)
             self.assertTrue(response['Content-Type'].startswith('application/json'))
-            self.check_response_data(response, keypath, response_object_name)
+            self.check_response_data(response, response_object_name)
 
         return response
 
