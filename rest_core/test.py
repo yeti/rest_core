@@ -244,12 +244,15 @@ class ManticomTestCase(APITestCaseWithAssertions):
             user,
             format="json",
             unauthorized=False,
-            status_OK=False
+            status_OK=False,
     ):
         """
         Runs a POST request and checks the POST data and results match the manticom schema
         """
-        self.check_schema_keys(data, self.schema_objects[request_object_name])
+        if isinstance(data, list):  # Check first object if this is a bulk create
+            self.check_schema_keys(data[0], self.schema_objects[request_object_name])
+        else:
+            self.check_schema_keys(data, self.schema_objects[request_object_name])
 
         self.add_credentials(user)
         response = self.client.post(url, data, format=format)
