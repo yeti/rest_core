@@ -12,7 +12,10 @@ class IsOwner(permissions.IsAuthenticated):
 
     def has_object_permission(self, request, view, obj):
         # Instance must have an attribute named `user`.
-        return obj.user == request.user
+        if isinstance(obj, User):
+            return obj == request.user
+        else:
+            return obj.user == request.user
 
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
